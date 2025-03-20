@@ -1,0 +1,31 @@
+#define RED_LED_PIN 8
+#define GREEN_LED_PIN 9
+#define BLUE_LED_PIN 10
+#define YELLOW_LED_PIN 11
+
+void setup() {
+  pinMode(RED_LED_PIN, OUTPUT);
+  pinMode(GREEN_LED_PIN, OUTPUT);
+  pinMode(BLUE_LED_PIN, OUTPUT);
+  pinMode(YELLOW_LED_PIN, OUTPUT);
+}
+
+void loop() {
+  int delayTime = 200; // temps de délai entre transitions des leds
+
+  digitalWrite(RED_LED_PIN, HIGH);
+  delay(delayTime);
+  digitalWrite(RED_LED_PIN, LOW);
+
+  digitalWrite(GREEN_LED_PIN, HIGH);
+  delay(delayTime);
+  digitalWrite(GREEN_LED_PIN, LOW);
+
+  digitalWrite(BLUE_LED_PIN, HIGH);
+  delay(delayTime);
+  digitalWrite(BLUE_LED_PIN, LOW);
+
+  digitalWrite(YELLOW_LED_PIN, HIGH);
+  delay(delayTime);
+  digitalWrite(YELLOW_LED_PIN, LOW);
+}

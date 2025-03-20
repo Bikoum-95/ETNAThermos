@@ -1,0 +1,82 @@
+#include "DHT.h"
+#include "Wire.h"
+#include "LiquidCrystal_I2C.h"
+
+#define YELLOW_LED_PIN 8
+#define BLUE_LED_PIN 9
+#define RED_LED_PIN 10
+#define GREEN_LED_PIN 11
+#define DHTPIN 2       // Broche DATA du DHT11 -> Broche 2 de l'Arduino
+#define DHTTYPE DHT11  // Type de capteur DHT11
+
+DHT dht(DHTPIN, DHTTYPE); // Initialisation du capteur DHT11
+LiquidCrystal_I2C lcd(0x27, 16, 2); // Initialisation de l'écran LCD I2C
+
+void setup() {
+  pinMode(YELLOW_LED_PIN, OUTPUT); // La LED jaune comme sortie
+  pinMode(BLUE_LED_PIN, OUTPUT); // La LED bleue comme sortie
+  pinMode(RED_LED_PIN, OUTPUT); // La LED rouge comme sortie
+  pinMode(GREEN_LED_PIN, OUTPUT); // La LED verte comme sortie
+  
+  lcd.init(); // Initialisation de l'afficheur
+  lcd.backlight(); // Activation du rétro-éclairage
+  dht.begin(); // Initialisation du capteur DHT11
+}
+
+void loop() {
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  if (isnan(temperature) || isnan(humidity)) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Erreur de lecture");
+    // Éteindre toutes les LEDs en cas d'erreur
+    digitalWrite(YELLOW_LED_PIN, LOW);
+    digitalWrite(BLUE_LED_PIN, LOW);
+    digitalWrite(RED_LED_PIN, LOW);
+    digitalWrite(GREEN_LED_PIN, LOW);
+  } else {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.println("Temp = " + String(dht.readTemperature())+" °C");
+    lcd.setCursor(0, 1);
+    lcd.println("Hum = " + String(dht.readHumidity())+" %");
+
+    // Éteindre toutes les LEDs
+    digitalWrite(YELLOW_LED_PIN, LOW);
+    digitalWrite(BLUE_LED_PIN, LOW);
+    digitalWrite(RED_LED_PIN, LOW);
+    digitalWrite(GREEN_LED_PIN, LOW);
+
+    // Allumer les LEDs progressivement en fonction de la température
+    if (temperature > 25) {
+    digitalWrite(GREEN_LED_PIN, HIGH);  // Température > 25°C
+    } else {
+      digitalWrite(RED_LED_PIN, LOW);
+      digitalWrite(BLUE_LED_PIN, LOW);
+      digitalWrite(YELLOW_LED_PIN, LOW);
+    }
+    if (temperature > 24) {
+    digitalWrite(RED_LED_PIN, HIGH);  // Température > 22°C
+    } else {
+      digitalWrite(GREEN_LED_PIN, LOW);
+      digitalWrite(BLUE_LED_PIN, LOW);
+      digitalWrite(YELLOW_LED_PIN, LOW);
+    }
+    if (temperature > 23) {
+    digitalWrite(BLUE_LED_PIN, HIGH);  // Température > 18°C
+    } else {
+      digitalWrite(RED_LED_PIN, LOW);
+      digitalWrite(RED_LED_PIN, LOW);
+      digitalWrite(YELLOW_LED_PIN, LOW);
+    }
+    if (temperature > 22) {
+    digitalWrite(YELLOW_LED_PIN, HIGH); // Température > 15°C
+    } else {
+      digitalWrite(RED_LED_PIN, LOW);
+      digitalWrite(BLUE_LED_PIN, LOW);
+      digitalWrite(RED_LED_PIN, LOW);
+    }
+  }
+}

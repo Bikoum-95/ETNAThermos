@@ -1,0 +1,78 @@
+#include "DHT.h"
+#include "Wire.h"
+#include "LiquidCrystal_I2C.h"
+
+#define YELLOW_LED_PIN 8
+#define BLUE_LED_PIN 9
+#define RED_LED_PIN 10
+#define GREEN_LED_PIN 11
+#define DHTPIN 2       // Broche DATA du DHT11 
+#define DHTTYPE DHT11  // Type de capteur DHT11
+
+DHT dht(DHTPIN, DHTTYPE); // initialise du capteur DHT11
+LiquidCrystal_I2C lcd(0x27, 16, 2); // initialise de l'écran LCD I2C
+
+void setup() {
+  pinMode(YELLOW_LED_PIN, OUTPUT); // La LED jaune comme sortie
+  pinMode(BLUE_LED_PIN, OUTPUT); // La LED bleue comme sortie
+  pinMode(RED_LED_PIN, OUTPUT); // La LED rouge comme sortie
+  pinMode(GREEN_LED_PIN, OUTPUT); // La LED verte comme sortie
+  
+  lcd.init(); // initialise de l'afficheur
+  lcd.backlight(); // activation du rétro-éclairage
+  dht.begin(); // initialise du capteur DHT11
+}
+
+void loop() {
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  if (isnan(temperature) || isnan(humidity)) {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Erreur de lecture");
+    // Éteindre toutes les LEDs en cas d'erreur
+    digitalWrite(YELLOW_LED_PIN, LOW);
+    digitalWrite(BLUE_LED_PIN, LOW);
+    digitalWrite(RED_LED_PIN, LOW);
+    digitalWrite(GREEN_LED_PIN, LOW);
+  } else {
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.println("Temp = " + String(dht.readTemperature())+" °C");
+    lcd.setCursor(0, 1);
+    lcd.println("Hum = " + String(dht.readHumidity())+" %");
+
+    // Éteindre toutes les LEDs
+    digitalWrite(YELLOW_LED_PIN, LOW);
+    digitalWrite(BLUE_LED_PIN, LOW);
+    digitalWrite(RED_LED_PIN, LOW);
+    digitalWrite(GREEN_LED_PIN, LOW);
+
+    if (temperature >= 25) {
+      digitalWrite(GREEN_LED_PIN, HIGH);
+      lcd.setCursor(0, 1);
+      lcd.print("Temp elevee!");
+    }
+    if (temperature >= 22) {
+      digitalWrite(RED_LED_PIN, HIGH);   
+      lcd.setCursor(0, 1);
+      lcd.print("Temp moderee");
+    }
+    if (temperature >= 18) {
+      digitalWrite(BLUE_LED_PIN, HIGH);  
+    }
+    if (temperature >= 15) {
+      digitalWrite(YELLOW_LED_PIN, HIGH); 
+    }
+
+    if (humidity < 30) {
+      lcd.setCursor(0, 1);
+      lcd.print("Humidite basse");
+    } else if (humidity > 60) {
+      lcd.setCursor(0, 1);
+      lcd.print("Humidite elevee");
+    }
+  }
+  delay(2000);
+}
